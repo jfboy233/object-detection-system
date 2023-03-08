@@ -37,7 +37,6 @@ def login():
                 }
                 return res
         else:
-            print("4")
             errors = form.username.errors + form.password.errors
             # print(db.session.query(db.exists().where(User.username == form.username.data)).scalar())
             res = {
