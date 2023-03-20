@@ -1,5 +1,5 @@
 from flask import Flask
-from extension import db
+from extension import db, mail, cache
 from config import DevConfig
 from flask_migrate import Migrate
 from flask_cors import CORS
@@ -10,17 +10,13 @@ CORS(app)
 # 绑定配置文件
 app.config.from_object(DevConfig)
 
+cache.init_app(app)
 db.init_app(app)
+mail.init_app(app)
 
 migrate = Migrate(app, db)
 
 app.register_blueprint(login_bp)
-
-
-@app.route('/')
-def hello_world():
-    return 'Hello World!'
-
 
 if __name__ == '__main__':
     app.run(debug=True)

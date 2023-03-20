@@ -10,18 +10,10 @@
         :default-active="path"
         router
     >
-      <el-menu-item index="/home" style="text-align: center;" ><i class="el-icon-share"></i>       数据统计</el-menu-item>
-      <el-menu-item index="/Batch" style="text-align: center"><i class="el-icon-platform-eleme"></i>批次管理</el-menu-item>
-      <el-menu-item index="/Enroll" style="text-align: center"><i class="el-icon-user-solid"></i>报名管理</el-menu-item>
-      <el-menu-item index="/EnrollTable" style="text-align: center"><i class="el-icon-star-on"></i>报名表</el-menu-item>
-      <el-menu-item index="/major" style="text-align: center"><i class="el-icon-info"></i>专业管理</el-menu-item>
-      <el-menu-item index="/news" style="text-align: center"><i class="el-icon-s-help"></i>招生简章</el-menu-item>
-      <el-menu-item index="/question" style="text-align: center"><i class="el-icon-magic-stick"></i>学生提问</el-menu-item>
-      <el-menu-item index="/open" style="text-align: center"><i class="el-icon-s-home"></i>公告</el-menu-item>
-      <el-submenu  style="text-align: center" index="1" v-if="user.role === 1">
-        <template #title ><i class="el-icon-s-platform"></i>系统管理</template>
-        <el-menu-item index="/user">用户管理</el-menu-item>
-      </el-submenu>
+      <el-menu-item index="/system/picture" style="text-align: center;" ><i class="el-icon-share"></i>图片识别</el-menu-item>
+      <el-menu-item index="/system/video" style="text-align: center"><i class="el-icon-platform-eleme"></i>视频识别</el-menu-item>
+      <el-menu-item index="/system/instant" style="text-align: center"><i class="el-icon-user-solid"></i>实时识别</el-menu-item>
+      <el-menu-item index="/system/log" style="text-align: center"><i class="el-icon-star-on"></i>历史记录</el-menu-item>
     </el-menu>
   </div>
 </template>
@@ -41,11 +33,11 @@ export default {
     let userStr = sessionStorage.getItem("user") || "{}"
     this.user = JSON.parse(userStr)
     // 请求服务端，确认当前登录用户的 合法信息
-    request.get("/user/" + this.user.id).then(res => {
-      if (res.code === '0') {
-        this.user = res.data
-      }
-    })
+    // request.get("/user/" + this.user.id).then(res => {
+    //   if (res.code === '0') {
+    //     this.user = res.data
+    //   }
+    // })
   }
 }
 </script>

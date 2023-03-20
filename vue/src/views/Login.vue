@@ -56,6 +56,7 @@ export default {
   },
   created() {
     sessionStorage.removeItem("user")
+    this.createValidCode()
   },
   methods: {
     // 接收验证码组件提交的 4位验证码
@@ -74,17 +75,18 @@ export default {
             return
           }
           request.post("/user/login", this.form).then(res => {
-            if (res.code === '0') {
+            if (res.data.code === '0') {
               this.$message({
                 type: "success",
                 message: "登录成功"
               })
+              console.log(res.data)
               sessionStorage.setItem("user", JSON.stringify(res.data))  // 缓存用户信息
-              this.$router.push("/")  //登录成功之后进行页面的跳转，跳转到主页
+              this.$router.push("/system")  //登录成功之后进行页面的跳转，跳转到主页
             } else {
               this.$message({
                 type: "error",
-                message: res.msg
+                message: res.data.msg
               })
             }
           })
