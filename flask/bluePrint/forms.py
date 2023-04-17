@@ -18,7 +18,7 @@ class EmailForm(wtforms.Form):
 
 class RegisterForm(wtforms.Form):
     email = wtforms.StringField(validators=[Email(message="邮箱格式错误！")])
-    code = wtforms.StringField(validators=[Length(min=4, max=4, message="验证码格式错误")])
+    code = wtforms.StringField(validators=[Length(max=4, message="验证码格式错误")])
     username = wtforms.StringField(validators=[Length(min=3, max=11, message="用户名格式错误！")])
     password = wtforms.StringField(validators=[Length(min=3, max=16, message="密码格式错误!")])
     confirm = wtforms.StringField(validators=[EqualTo("password")])

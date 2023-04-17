@@ -1,29 +1,38 @@
 <template>
-  <el-card style="width: 40%; margin: 10px">
+  <el-card style="width: 60%; margin: 10px">
     <el-form ref="form" :model="form" label-width="80px">
-      <el-form-item style="text-align: center" label-width="0">
-        <el-upload
-            class="avatar-uploader"
-            action="http://localhost:5000/files/upload"
-            :show-file-list="false"
-            :on-success="handleAvatarSuccess"
-        >
-          <img v-if="form.avatar" :src="form.avatar" class="avatar">
-          <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-        </el-upload>
+      <div style="text-align: center;margin:50px 38%;" >
+        <el-form-item>
+          <el-upload
+              class="avatar-uploader"
+              action="http://localhost:5000/api/upload/avatar"
+              :show-file-list="false"
+              :on-success="handleAvatarSuccess"
+              :data="{'username': form.username}"
+          >
+            <img v-if="form.head" :src="form.head" class="avatar">
+            <el-icon v-else class="avatar-uploader-icon" style="border: dashed 1px silver"><Plus/></el-icon>
+          </el-upload>
+        </el-form-item>
+      </div>
+      <el-form-item label="邮件">
+        <el-input v-model="form.email" disabled></el-input>
       </el-form-item>
       <el-form-item label="用户名">
-        <el-input v-model="form.username" disabled></el-input>
+        <el-input v-model="form.username" v-bind:disabled="!flag"></el-input>
       </el-form-item>
       <el-form-item label="电话">
-        <el-input v-model="form.phone"></el-input>
+        <el-input v-model="form.phone" v-bind:disabled="!flag"></el-input>
       </el-form-item>
-      <el-form-item label="邮件">
-        <el-input v-model="form.email"></el-input>
+      <el-form-item label="新的密码">
+        <el-input v-model="form.pwd" v-bind:disabled="flag"></el-input>
       </el-form-item>
+
     </el-form>
     <div style="text-align: center">
-      <el-button type="primary" @click="update">保存</el-button>
+      <el-button type="primary" @click="update" v-show="!dialogButtonVisible">保存</el-button>
+      <el-button type="danger" @click="change_pwd" v-show="!dialogButtonVisible">修改密码</el-button>
+      <el-button type="danger" @click="update_pwd" v-show="dialogButtonVisible">保存密码</el-button>
     </div>
   </el-card>
 </template>
@@ -35,17 +44,39 @@ export default {
 name: "Person",
 data() {
   return {
-    form: {}
+    form: {},
+    uploadParam:{
+      open: false,
+      // 是否禁用上传
+      enableUpload: false,
+      // 是否更新已经存在的数据
+      updateSupport: 0,
+      limit: 3,
+      // 上传的地址,这个地方写自己的后台地址
+      // url: this.GLOBAL.serverSrc + "/uploadController/uploadImg",
+      ContentType:"application/json"
+    },
+    flag: true,
+    dialogButtonVisible: false
   }
 },
 created() {
   let str = sessionStorage.getItem("user")
-  this.form = JSON.parse(str)
+  this.form = JSON.parse(str).data
 },
 methods: {
   handleAvatarSuccess(res) {
-    this.form.head = res.data
+    this.form.head = res.head
     this.$message.success("上传成功")
+    console.log(this.form)
+  },
+  change_pwd() {
+    this.flag = false
+    this.dialogButtonVisible = true
+  },
+  update_pwd() {
+    this.flag = true
+    this.dialogButtonVisible = false
   },
   update() {
     request.put("/user", this.form).then(res => {

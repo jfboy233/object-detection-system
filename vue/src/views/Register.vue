@@ -110,6 +110,7 @@ export default {
               })
               this.$router.push("/login")  //登录成功之后进行页面的跳转，跳转到主页
             } else {
+              console.log(res.data)
               this.$message({
                 type: "error",
                 message: res.data.msg

@@ -6,7 +6,7 @@
         <div style="font-size: 30px; text-align: center; padding: 30px 0; ">欢迎登录</div>
         <el-form ref="form" :model="form" size="normal" :rules="rules">
           <el-form-item prop="username">
-            <el-input prefix-icon="el-icon-user-solid" v-model="form.username" placeholder="请输入账号"></el-input>
+            <el-input prefix-icon="el-icon-user-solid" v-model="form.username" placeholder="请输入用户名"></el-input>
           </el-form-item>
           <el-form-item prop="password">
             <el-input prefix-icon="el-icon-lock" v-model="form.password" show-password placeholder="请输入密码"></el-input>
@@ -80,7 +80,7 @@ export default {
                 type: "success",
                 message: "登录成功"
               })
-              console.log(res.data)
+              console.log(res)
               sessionStorage.setItem("user", JSON.stringify(res.data))  // 缓存用户信息
               this.$router.push("/system")  //登录成功之后进行页面的跳转，跳转到主页
             } else {

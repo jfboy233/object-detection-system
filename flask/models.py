@@ -29,3 +29,17 @@ class User(db.Model):
             'email': self.email,
         }
 
+    def set_head(self, head):
+        self.head = head
+
+    def set_phone(self, phone):
+        self.phone = phone
+
+
+class Cache(db.Model):
+    email = db.Column(db.String(255), nullable=False, primary_key=True)
+    validCode = db.Column(db.String(255), nullable=False)
+
+    def __init__(self, email, validCode):
+        self.email = email
+        self.validCode = validCode

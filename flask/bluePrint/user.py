@@ -1,10 +1,9 @@
 from flask import Blueprint, request, jsonify
-from models import User
+from models import User, Cache
 from .forms import RegisterForm, LoginForm, EmailForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from extension import db, mail
 from flask_mail import Message
-from utils import cpcache
 import string
 import random
 
@@ -29,6 +28,7 @@ def login():
                     'code': '0',
                     'data': user.to_dict()
                 }
+                # 设置cookie
                 resp = jsonify(res)
                 resp.status_code = 200
                 return resp
@@ -63,16 +63,28 @@ def register():
         if form.validate():
             username = form.username.data
             pwd = form.password.data
-            user = User(username=username, pwd=generate_password_hash(pwd), role=1)
-            db.session.add(user)
-            db.session.commit()
-            res = {
-                'msg': "注册成功",
-                'code': '0',
-            }
-            return res
+            validCode = form.code.data
+            email = form.email.data
+            cache = Cache.query.filter_by(email=email).first()
+            # 验证码是否正确
+            if validCode == cache.validCode:
+                user = User(email=email, username=username, pwd=generate_password_hash(pwd), role=1)
+                db.session.add(user)
+                db.session.commit()
+                db.session.query(Cache).filter(Cache.email == email).delete()
+                res = {
+                    'msg': "注册成功",
+                    'code': '0',
+                }
+                return res
+            else:
+                res = {
+                    'msg': "验证码错误",
+                    'code': '1',
+                }
+                return res
         else:
-            errors = form.username.errors + form.password.errors
+            errors = form.username.errors + form.password.errors + form.email.errors + form.validCode.errors
             # print(db.session.query(db.exists().where(User.username == form.username.data)).scalar())
             res = {
                 'msg': errors[0],
@@ -111,9 +123,14 @@ def sendCode():
                     'code': '1',
                 }
                 return res
-            # 将验证码存入redis数据库
-            cpcache.set(email, validCode)
-            print(cpcache.get(email))
+            # 将验证码存入Cache表中
+            ## 验证表中是否有数据冲突，若冲突，删除
+            if email == Cache.query.filter_by(email=email).first().email:
+                db.session.query(Cache).filter(Cache.email == email).delete()
+            ## 在数据库表中加入验证码条目
+            cache = Cache(email=email, validCode=validCode)
+            db.session.add(cache)
+            db.session.commit()
             res = {
                 'msg': "发送成功",
                 'code': '0',
