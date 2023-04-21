@@ -80,7 +80,6 @@ export default {
                 type: "success",
                 message: "登录成功"
               })
-              console.log(res)
               sessionStorage.setItem("user", JSON.stringify(res.data))  // 缓存用户信息
               this.$router.push("/system")  //登录成功之后进行页面的跳转，跳转到主页
             } else {

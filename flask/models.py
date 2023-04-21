@@ -43,3 +43,20 @@ class Cache(db.Model):
     def __init__(self, email, validCode):
         self.email = email
         self.validCode = validCode
+
+
+class Picture(db.Model):
+    id = db.Column(db.Integer(), primary_key=True, autoincrement=True)
+    userId = db.Column(db.Integer())
+    fileName = db.Column(db.String(255), nullable=False)
+    time = db.Column(db.DateTime(), nullable=False)
+    state = db.Column(db.Integer())  # 1,未处理 2,处理中 3,已完成
+    origin_path = db.Column(db.String(255), nullable=False)
+    target_path = db.Column(db.String(255))
+
+    def __init__(self, userId, fileName, time, path):
+        self.userId = userId
+        self.fileName = fileName
+        self.time = time
+        self.state = 1
+        self.origin_path = path

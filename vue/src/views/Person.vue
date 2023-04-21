@@ -68,7 +68,6 @@ methods: {
   handleAvatarSuccess(res) {
     this.form.head = res.head
     this.$message.success("上传成功")
-    console.log(this.form)
   },
   change_pwd() {
     this.flag = false
