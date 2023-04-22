@@ -48,9 +48,9 @@
       <el-table-column label="操作">
         <template #default="scope">
           <el-button size="small" type="primary" plain @click="originScan(scope.row.origin)">原图</el-button>
-          <el-button size="small" type="primary" plain @click="" :disabled="scope.row.state !== 1">处理</el-button>
-          <el-button size="small" type="primary" plain @click="" :disabled="scope.row.state !== 3">查看</el-button>
-          <el-button size="small" type="primary" plain @click="handleEdit(scope.row)" :disabled="scope.row.state !== 3">下载</el-button>
+          <el-button size="small" type="primary" plain @click="detect(scope.row)" :disabled="scope.row.state !== 1">处理</el-button>
+          <el-button size="small" type="primary" plain @click="targetScan(scope.row.target)" :disabled="scope.row.state !== 3">查看</el-button>
+          <el-button size="small" type="primary" plain @click="download(scope.row.target, scope.row.filename)" :disabled="scope.row.state !== 3">下载</el-button>
           <el-popconfirm title="确定删除吗？" @confirm="handleDelete(scope.row.id)">
             <template #reference>
               <el-button size="small" type="danger">删除</el-button>
@@ -84,13 +84,18 @@
             'username': user.username,
             'userId': user.id
           }"
-      ><el-button type="primary">select file</el-button>
+      ><el-button type="primary">选择图片</el-button>
       </el-upload>
     </el-dialog>
 
     <!--    原图 弹出框-->
     <el-dialog title="查看原图" v-model="dialogVisible2" width="30%">
       <el-image  :src="originScanUrl" fit="fill" />
+    </el-dialog>
+
+    <!--    结果图 弹出框-->
+    <el-dialog title="查看结果" v-model="dialogVisible3" width="30%">
+      <el-image  :src="targetScanUrl" fit="fill" />
     </el-dialog>
   </div>
 </template>
@@ -106,7 +111,9 @@ export default {
       loading: true,
       dialogVisible1: false, // 新增
       dialogVisible2: false, // 原图
+      dialogVisible3: false, // 检测结果
       originScanUrl: "",
+      targetScanUrl: "",
       currentPage: 1,
       pageSize: 10,
       total: 0,
@@ -143,12 +150,6 @@ export default {
         this.total = res.data.total
       })
     },
-    handleUploadSuccess(res) {
-      if (res.code === "0") {
-        this.$message.success("导入成功")
-        this.load()
-      }
-    },
     add() {
       this.dialogVisible1 = true
     },
@@ -156,44 +157,26 @@ export default {
       this.dialogVisible2 = true
       this.originScanUrl = url
     },
-    save() {
-      if (this.form.id) {  // 更新
-        request.put("/user", this.form).then(res => {
-          console.log(res)
-          if (res.code === '0') {
-            this.$message({
-              type: "success",
-              message: "更新成功"
-            })
-          } else {
-            this.$message({
-              type: "error",
-              message: res.msg
-            })
-          }
-          this.load() // 刷新表格的数据
-          this.dialogVisible = false  // 关闭弹窗
-        })
-      } else {  // 新增
-        request.post("/user", this.form).then(res => {
-          console.log(res)
-          if (res.code === '0') {
-            this.$message({
-              type: "success",
-              message: "新增成功"
-            })
-          } else {
-            this.$message({
-              type: "error",
-              message: res.msg
-            })
-          }
-
-          this.load() // 刷新表格的数据
-          this.dialogVisible = false  // 关闭弹窗
-        })
-      }
-
+    targetScan(url){
+      this.dialogVisible3 = true
+      this.targetScanUrl = url
+    },
+    download(url, filename){
+      fetch (url)
+          .then ( (response) => response.blob ())
+          .then ( (blob) => {
+            // 创建 blob 链接
+            const url = window.URL.createObjectURL (blob);
+            const link = document.createElement ('a');
+            link.href = url;
+            link.setAttribute ('download', 'result-'+filename);
+            // 添加到网页
+            document.body.appendChild (link);
+            // 开始下载
+            link.click ();
+            // 清理并移除链接
+            link.parentNode.removeChild (link);
+          });
     },
     handleDelete(id) {
       request.delete("/picture/delete", {params: {picId: id}}).then(res => {
@@ -210,6 +193,16 @@ export default {
         }
         this.load()  // 删除之后重新加载表格的数据
       })
+    },
+    detect(row){
+      request.post("/yolo/picture", {
+                                  source: row.origin,
+                                  picId: row.id,
+                                  }).then(res=>{
+        console.log(res)
+      })
+        this.load() // 刷新表格的数据
+
     },
     handleSizeChange(pageSize) {   // 改变当前每页的个数触发
       this.pageSize = pageSize

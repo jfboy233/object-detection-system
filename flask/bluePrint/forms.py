@@ -1,6 +1,6 @@
 import wtforms
 from wtforms.validators import Length, EqualTo, Email
-from models import User
+from model import User
 
 
 class EmailForm(wtforms.Form):

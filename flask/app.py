@@ -6,6 +6,7 @@ from flask_cors import CORS
 from bluePrint.user import bp as login_bp
 from bluePrint.upload import bp as upload_bp
 from bluePrint.picture import bp as picture_bp
+from bluePrint.yolo import bp as yolo_bp
 
 app = Flask(__name__,
             template_folder='.',  # 表示在当前目录寻找模板文件
@@ -26,6 +27,7 @@ migrate = Migrate(app, db)
 app.register_blueprint(login_bp)
 app.register_blueprint(upload_bp)
 app.register_blueprint(picture_bp)
+app.register_blueprint(yolo_bp)
 
 if __name__ == '__main__':
     app.run(debug=True)

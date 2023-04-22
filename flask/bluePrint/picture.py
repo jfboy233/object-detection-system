@@ -1,5 +1,5 @@
 from flask import Blueprint, request, send_from_directory, jsonify
-from models import User, Picture
+from model import User, Picture
 from extension import db
 from urllib.parse import urlparse
 import os
@@ -55,12 +55,16 @@ def deletePicture():
     target_url = picture.target_path
     # 删除图片
     if origin_url:
-        origin_path = urlparse(origin_url)
-        if os.path.exists(origin_path.path[1:]):
-            os.remove(origin_path.path[1:])
+        origin_path = urlparse(origin_url).path[1:]
+        if os.path.exists(origin_path):
+            os.remove(origin_path)
     if target_url:
-        target_path = urlparse(target_url)
-        os.remove('..' + target_path.path)
+        target_path = urlparse(target_url).path[1:]
+        dir, file = os.path.split(target_path)
+        if os.path.exists(target_path):
+            os.remove(target_path)
+            os.rmdir(dir)
+
     # 删除数据库条目
     db.session.delete(picture)
     db.session.commit()

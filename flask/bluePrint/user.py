@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from models import User, Cache
+from model import User, Cache
 from .forms import RegisterForm, LoginForm, EmailForm
 from werkzeug.security import generate_password_hash, check_password_hash
 from extension import db, mail

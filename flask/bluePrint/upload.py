@@ -1,6 +1,6 @@
 from flask import Blueprint, request, send_from_directory
 from urllib.parse import urljoin
-from models import User, Picture
+from model import User, Picture
 from extension import db
 from datetime import datetime
 import string
